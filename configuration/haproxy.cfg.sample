@@ -1,0 +1,14 @@
+defaults
+    mode tcp
+    timeout connect 5s
+    timeout client 1m
+    timeout server 1m
+
+frontend http
+    bind *:80
+    default_backend app
+
+backend app
+    balance roundrobin
+    server node01 <IP>:<PORT>
+    server node02 <IP>:<PORT>

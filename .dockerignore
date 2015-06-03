@@ -1,0 +1,5 @@
+.dockerfile
+circle.yml
+configuration/haproxy.cfg.original
+configuration/haproxy.cfg.sample
+README.md

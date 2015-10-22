@@ -2,28 +2,16 @@ machine:
   services:
     - docker
 
+dependencies:
+  override:
+    - ./build/ci/script/build.sh
+
 test:
   override:
-
-    # Create a test configuration file that will simply send us to `github.com` or `bitbucket.ru`.
-
-    - docker build -t ianbytchek/haproxy .
-    - |
-      cp configuration/haproxy.cfg.sample configuration/haproxy.cfg
-      sed -i \
-        -e 's/\(node01\) <IP>:<PORT>/\1 github.com:80/g' \
-        -e 's/\(node02\) <IP>:<PORT>/\1 bitbucket.com:80/g' \
-        configuration/haproxy.cfg
-      cat configuration/haproxy.cfg
-    - docker run -d -p 80:80 -v $(pwd)/configuration:/docker/configuration ianbytchek/haproxy; sleep 5
-    - curl --retry 10 --retry-delay 5 -v http://localhost:80
+    - ./build/ci/script/test.sh
 
 deployment:
   hub:
     branch: master
     commands:
-
-      # Authenticate with docker and push the latest image.
-
-      - docker login -e $DOCKER_HUB_EMAIL -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
-      - docker push ianbytchek/haproxy
+      - ./build/ci/script/deploy.sh

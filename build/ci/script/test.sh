@@ -2,23 +2,35 @@
 
 set -euo pipefail
 
-cp './src/configuration/haproxy.cfg.sample' './src/configuration/haproxy.cfg'
+# Test running container with a single configuration file.
 
-sed -i \
-    -e 's/\(node01\) <IP>:<PORT>/\1 github.com:80/g' \
-    -e 's/\(node02\) <IP>:<PORT>/\1 bitbucket.com:80/g' \
-    './src/configuration/haproxy.cfg'
+cat <<-EOL > './src/configuration/haproxy.cfg'
+	defaults
+	    mode tcp
+	    timeout connect 5s
+	    timeout client 1m
+	    timeout server 1m
+
+	frontend http
+	    bind *:80
+	    default_backend app
+
+	backend app
+	    balance roundrobin
+	    server node01 github.com:80
+	    server node02 bitbucket.com:80
+EOL
 
 echo 'Using the following configuration to test haproxy.'
 cat './src/configuration/haproxy.cfg'
 echo -e '\n'
 
 echo -n 'Starting haproxy container…'
-docker run \
+container_name=$(docker run \
     --detach \
     --publish '80:80' \
     --volume "$(pwd)/src/configuration:/etc/haproxy" \
-    ianbytchek/haproxy > /dev/null
+    ianbytchek/haproxy)
 echo ' OK!'
 
 sleep 5
@@ -26,3 +38,39 @@ sleep 5
 echo -n 'Checking if haproxy is available via curl… '
 curl --retry 10 --retry-delay 5 --silent 'http://localhost:80' > /dev/null
 echo ' OK!'
+
+# Check if container starts as expected with multiple configuration files.
+
+rm './src/configuration/haproxy.cfg'
+
+cat <<-EOL > './src/configuration/defaults.cfg'
+	defaults
+	    mode tcp
+	    timeout connect 5s
+	    timeout client 1m
+	    timeout server 1m
+EOL
+
+cat <<-EOL > './src/configuration/app.cfg'
+	frontend http
+	    bind *:80
+	    default_backend app
+
+	backend app
+	    balance roundrobin
+	    server node01 github.com:80
+	    server node02 bitbucket.com:80
+EOL
+
+echo 'Using multiple configurations to test haproxy.'
+
+echo -n 'Restarting haproxy container…'
+docker restart "${container_name}" > /dev/null
+echo ' OK!'
+
+sleep 5
+
+echo -n 'Checking if haproxy is available via curl… '
+curl --retry 10 --retry-delay 5 --silent 'http://localhost:80' > /dev/null
+echo ' OK!'
+

@@ -18,9 +18,9 @@ if [ "${1}" == 'haproxy' ]; then
     configuration_paths=''
 
     for file in '/etc/haproxy/'*'.cfg'; do
-        [ "${#configuration_paths}" > 0 ] && configuration_paths+=', '
-        configuration_paths+="${file}"
-        configuration_command+=" -f ${file}"
+        [ "${#configuration_paths}" > 0 ] && configuration_paths="${configuration_paths}, "
+        configuration_paths="${configuration_paths}${file}"
+        configuration_command="${configuration_command} -f ${file}"
     done
 
     if [ -n "${configuration_command}" ]; then

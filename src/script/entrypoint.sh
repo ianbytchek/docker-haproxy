@@ -1,13 +1,14 @@
 #!/usr/bin/env sh
 
+set -euo pipefail
 cd $(dirname $0)
 
 if [ $1 = 'haproxy' ]; then
 
     # If we have haproxy.cfg available in our configuration directory, then we use it, otherwise use the standard haproxy.cfg.
 
-    if [ -f /docker/configuration/haproxy.cfg ]; then
-        haproxy -f '/docker/configuration/haproxy.cfg'
+    if [ -f '/etc/haproxy/haproxy.cfg' ]; then
+        haproxy -f '/etc/haproxy/haproxy.cfg'
     else
         cat <<-EOF
 
@@ -20,6 +21,6 @@ if [ $1 = 'haproxy' ]; then
 
 		EOF
 
-        haproxy -f /etc/haproxy/haproxy.cfg
+        exit 1
     fi
 fi

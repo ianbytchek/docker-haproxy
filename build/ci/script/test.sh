@@ -11,13 +11,13 @@ sed -i \
 
 echo 'Using the following configuration to test haproxy.'
 cat './src/configuration/haproxy.cfg'
-echo '\n\n'
+echo -e '\n'
 
 echo -n 'Starting haproxy container…'
 docker run \
     --detach \
     --publish '80:80' \
-    --volume "$(pwd)/src/configuration:/docker/configuration" \
+    --volume "$(pwd)/src/configuration:/etc/haproxy" \
     ianbytchek/haproxy > /dev/null
 echo ' OK!'
 

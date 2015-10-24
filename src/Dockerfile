@@ -4,7 +4,7 @@ MAINTAINER Ian Bytchek
 COPY . /docker
 RUN /docker/script/build.sh
 EXPOSE 80 443
-VOLUME /docker/configuration
+VOLUME /etc/haproxy
 
-ENTRYPOINT ["/docker/script/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["haproxy"]

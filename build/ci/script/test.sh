@@ -35,7 +35,7 @@ echo ' OK!'
 
 sleep 5
 
-echo -n 'Checking if haproxy is available via curl… '
+echo -n 'Checking if haproxy is available via curl…'
 curl --retry 10 --retry-delay 5 --silent 'http://localhost:80' > /dev/null
 echo ' OK!'
 
@@ -70,7 +70,9 @@ echo ' OK!'
 
 sleep 5
 
-echo -n 'Checking if haproxy is available via curl… '
+echo -n 'Checking if haproxy is available via curl…'
 curl --retry 10 --retry-delay 5 --silent 'http://localhost:80' > /dev/null
 echo ' OK!'
 
+echo 'Below are haproxy docker logs:'
+docker logs "${container_name}"

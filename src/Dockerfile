@@ -7,4 +7,4 @@ EXPOSE 80 443
 VOLUME /etc/haproxy
 
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["haproxy"]
+CMD ["start"]

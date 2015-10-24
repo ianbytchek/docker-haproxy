@@ -3,15 +3,21 @@
 set -euo pipefail
 cd "$(dirname $0)"
 
-if [ "${1}" == 'haproxy' ]; then
+command="${1}"
+
+if [ "${command}" == 'start' ] || [ "${command}" == 'check' ]; then
 
     # If we have haproxy.cfg available in our configuration directory, then we use it, otherwise use the standard haproxy.cfg.
 
     configuration_path='/etc/haproxy/haproxy.cfg'
 
-    if [ -f "${configuration_path}" ]; then
-        echo "Starting haproxy with default configuration, ${configuration_path}."
+    if [ -f "${configuration_path}" ] && [ "${command}" == 'start' ]; then
+        echo "Starting haproxy with configuration at default location, ${configuration_path}."
         haproxy -f "${configuration_path}"
+    elif [ -f "${configuration_path}" ] && [ "${command}" == 'check' ]; then
+        echo "Checking haproxy with configuration at default location, ${configuration_path}."
+        haproxy -c -f "${configuration_path}"
+        exit 0
     fi
 
     configuration_command=''
@@ -23,9 +29,13 @@ if [ "${1}" == 'haproxy' ]; then
         configuration_command="${configuration_command} -f ${file}"
     done
 
-    if [ -n "${configuration_command}" ]; then
+    if [ -n "${configuration_command}" ] && [ "${command}" == 'start' ]; then
         echo "Starting haproxy with multiple configurations, ${configuration_paths}."
         eval "haproxy ${configuration_command}"
+    elif [ -n "${configuration_command}" ] && [ "${command}" == 'check' ]; then
+        echo "Checking haproxy with multiple configurations, ${configuration_paths}."
+        eval "haproxy -c ${configuration_command}"
+        exit 0
     fi
 
     cat <<-EOF
@@ -41,3 +51,5 @@ if [ "${1}" == 'haproxy' ]; then
 
     exit 1
 fi
+
+exec "${@}"

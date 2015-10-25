@@ -24,7 +24,7 @@ if [ "${command}" == 'start' ] || [ "${command}" == 'check' ]; then
     configuration_paths=''
 
     for file in '/etc/haproxy/'*'.cfg'; do
-        [ "${#configuration_paths}" > 0 ] && configuration_paths="${configuration_paths}, "
+        [ "${#configuration_paths}" -gt 0 ] && configuration_paths="${configuration_paths}, "
         configuration_paths="${configuration_paths}${file}"
         configuration_command="${configuration_command} -f ${file}"
     done
